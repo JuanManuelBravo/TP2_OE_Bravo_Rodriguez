@@ -9,10 +9,22 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
+# -----------------------------------------------------------------------------
+# Configuración de rutas
+# Se usan rutas relativas para que el script funcione en Colab o en otra PC.
+# -----------------------------------------------------------------------------
+
 RUTA_DATOS  = os.path.join(os.getcwd(), 'datos', 'sales_data.csv')
 RUTA_RESULT = os.path.join(os.getcwd(), 'resultados')
 
 os.makedirs(RUTA_RESULT, exist_ok=True)
+
+
+# -----------------------------------------------------------------------------
+# Carga del dataset
+# Se lee el CSV fila por fila con el módulo csv y se almacenan los datos
+# en listas simples para poder operar con ellos.
+# -----------------------------------------------------------------------------
 
 fechas = []
 montos = []
@@ -22,6 +34,12 @@ with open(RUTA_DATOS, newline='', encoding='utf-8') as archivo:
     for fila in lector:
         fechas.append(fila['sales_date'])       # cadena de texto "YYYY-MM-DD"
         montos.append(float(fila['sales_amount']))
+
+
+# -----------------------------------------------------------------------------
+# Indicadores generales
+# Calculamos las métricas básicas del año
+# -----------------------------------------------------------------------------
 
 print("=" * 55)
 print("ANÁLISIS DE VENTAS 2024")
@@ -47,6 +65,12 @@ print(f"  Día con mayor venta:    {dia_max}  ($ {venta_max:,.0f})")
 print(f"  Día con menor venta:    {dia_min}  ($ {venta_min:,.0f})")
 
 
+# -----------------------------------------------------------------------------
+# Top 10 días con mayores ventas
+# Se combinan fechas y montos en una lista de tuplas, se ordena de mayor
+# a menor por monto, y se toman los primeros 10 resultados.
+# -----------------------------------------------------------------------------
+
 registros = list(zip(fechas, montos))
 top10 = sorted(registros, key=lambda x: x[1], reverse=True)[:10]
 
@@ -67,6 +91,11 @@ with open(ruta_top10, 'w', newline='', encoding='utf-8') as f:
         escritor.writerow([i, fecha, monto])
 print(f"\n  → Exportado: {ruta_top10}")
 
+# -----------------------------------------------------------------------------
+# Ventas agrupadas por mes
+# Se recorre la lista de registros y se acumula el total de ventas
+# por mes usando un diccionario, donde la clave es "YYYY-MM".
+# -----------------------------------------------------------------------------
 
 ventas_por_mes = {}
 
@@ -102,6 +131,11 @@ with open(ruta_mensual, 'w', newline='', encoding='utf-8') as f:
         escritor.writerow([mes, total])
 print(f"  → Exportado: {ruta_mensual}")
 
+# -----------------------------------------------------------------------------
+# Gráfico 1: Evolución diaria de ventas
+# Se grafica la serie temporal completa para observar la variabilidad
+# y la tendencia general de las ventas a lo largo del año.
+# -----------------------------------------------------------------------------
 
 fig, ax = plt.subplots(figsize=(14, 5))
 
@@ -135,6 +169,12 @@ plt.savefig(ruta_graf1, dpi=150)
 plt.close()
 print(f"\n  → Gráfico exportado: {ruta_graf1}")
 
+
+# -----------------------------------------------------------------------------
+# Gráfico 2: Ventas totales por mes (barras)
+# El gráfico de barras permite comparar los meses entre sí de forma
+# visual, destacando el mejor y el peor mes del año.
+# -----------------------------------------------------------------------------
 
 colores = []
 for mes in meses:
@@ -174,6 +214,9 @@ plt.savefig(ruta_graf2, dpi=150)
 plt.close()
 print(f"  → Gráfico exportado: {ruta_graf2}")
 
+# -----------------------------------------------------------------------------
+# FIN DEL SCRIPT
+# -----------------------------------------------------------------------------
 
 print("\n" + "=" * 55)
 print("Análisis finalizado. Archivos guardados en /resultados.")
