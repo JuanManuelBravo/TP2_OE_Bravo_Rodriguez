@@ -64,3 +64,39 @@ with open(ruta_top10, 'w', newline='', encoding='utf-8') as f:
     for i, (fecha, monto) in enumerate(top10, start=1):
         escritor.writerow([i, fecha, monto])
 print(f"\n  → Exportado: {ruta_top10}")
+
+
+ventas_por_mes = {}
+
+for fecha, monto in registros:
+    mes = fecha[:7]   # tomar solo "YYYY-MM" de "YYYY-MM-DD"
+    if mes not in ventas_por_mes:
+        ventas_por_mes[mes] = 0
+    ventas_por_mes[mes] += monto
+
+# Ordenar por mes cronológicamente
+meses   = sorted(ventas_por_mes.keys())
+totales = [ventas_por_mes[m] for m in meses]
+
+mes_mayor = meses[totales.index(max(totales))]
+mes_menor = meses[totales.index(min(totales))]
+
+print("\n" + "=" * 55)
+print("VENTAS POR MES")
+print("=" * 55)
+print(f"  {'Mes':<12} {'Total ($)'}")
+print(f"  {'-'*11} {'-'*12}")
+for mes, total in zip(meses, totales):
+    print(f"  {mes:<12} $ {total:,.0f}")
+print(f"\n  Mes con más ventas:   {mes_mayor}  ($ {max(totales):,.0f})")
+print(f"  Mes con menos ventas: {mes_menor}  ($ {min(totales):,.0f})")
+
+# Exportar resumen mensual a CSV
+ruta_mensual = os.path.join(RUTA_RESULT, 'resumen_ventas_mensuales.csv')
+with open(ruta_mensual, 'w', newline='', encoding='utf-8') as f:
+    escritor = csv.writer(f)
+    escritor.writerow(['Mes', 'Total'])
+    for mes, total in zip(meses, totales):
+        escritor.writerow([mes, total])
+print(f"  → Exportado: {ruta_mensual}")
+
