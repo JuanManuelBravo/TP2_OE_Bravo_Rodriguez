@@ -6,6 +6,8 @@
 
 import csv
 import os
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 
 RUTA_DATOS  = os.path.join(os.getcwd(), 'datos', 'sales_data.csv')
 RUTA_RESULT = os.path.join(os.getcwd(), 'resultados')
@@ -99,4 +101,37 @@ with open(ruta_mensual, 'w', newline='', encoding='utf-8') as f:
     for mes, total in zip(meses, totales):
         escritor.writerow([mes, total])
 print(f"  → Exportado: {ruta_mensual}")
+
+
+fig, ax = plt.subplots(figsize=(14, 5))
+
+ax.plot(range(len(montos)), montos, color='steelblue', linewidth=0.8)
+ax.axhline(venta_promedio, color='tomato', linestyle='--', linewidth=1.2,
+           label=f'Promedio diario: ${venta_promedio:,.0f}')
+
+# Marcar en el eje X el primer día de cada mes
+indices_meses   = []
+etiquetas_meses = []
+mes_actual = None
+for i, fecha in enumerate(fechas):
+    mes = fecha[:7]
+    if mes != mes_actual:
+        indices_meses.append(i)
+        etiquetas_meses.append(mes)
+        mes_actual = mes
+
+ax.set_xticks(indices_meses)
+ax.set_xticklabels(etiquetas_meses, rotation=30, fontsize=8)
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'${x:,.0f}'))
+ax.set_title('Evolución Diaria de Ventas – 2024', fontsize=13, fontweight='bold')
+ax.set_xlabel('Mes', fontsize=10)
+ax.set_ylabel('Monto ($)', fontsize=10)
+ax.legend(fontsize=9)
+ax.grid(axis='y', linestyle='--', alpha=0.4)
+plt.tight_layout()
+
+ruta_graf1 = os.path.join(RUTA_RESULT, 'grafico_ventas_diarias.png')
+plt.savefig(ruta_graf1, dpi=150)
+plt.close()
+print(f"\n  → Gráfico exportado: {ruta_graf1}")
 
