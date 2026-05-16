@@ -135,3 +135,46 @@ plt.savefig(ruta_graf1, dpi=150)
 plt.close()
 print(f"\n  → Gráfico exportado: {ruta_graf1}")
 
+
+colores = []
+for mes in meses:
+    if mes == mes_mayor:
+        colores.append('tomato')
+    elif mes == mes_menor:
+        colores.append('lightcoral')
+    else:
+        colores.append('steelblue')
+
+fig, ax = plt.subplots(figsize=(12, 5))
+bars = ax.bar(meses, totales, color=colores, edgecolor='white', linewidth=0.6)
+
+# Etiqueta encima de cada barra
+for bar, total in zip(bars, totales):
+    ax.text(bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 1500,
+            f'${total:,.0f}',
+            ha='center', va='bottom', fontsize=7.5)
+
+ax.set_title('Ventas Totales por Mes – 2024', fontsize=13, fontweight='bold')
+ax.set_xlabel('Mes', fontsize=10)
+ax.set_ylabel('Total ($)', fontsize=10)
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'${x:,.0f}'))
+ax.tick_params(axis='x', rotation=30)
+ax.grid(axis='y', linestyle='--', alpha=0.4)
+
+from matplotlib.patches import Patch
+leyenda = [Patch(color='tomato',     label='Mes con más ventas'),
+           Patch(color='lightcoral', label='Mes con menos ventas'),
+           Patch(color='steelblue',  label='Resto de meses')]
+ax.legend(handles=leyenda, fontsize=8, loc='upper left')
+plt.tight_layout()
+
+ruta_graf2 = os.path.join(RUTA_RESULT, 'grafico_ventas_mensuales.png')
+plt.savefig(ruta_graf2, dpi=150)
+plt.close()
+print(f"  → Gráfico exportado: {ruta_graf2}")
+
+
+print("\n" + "=" * 55)
+print("Análisis finalizado. Archivos guardados en /resultados.")
+print("=" * 55)
